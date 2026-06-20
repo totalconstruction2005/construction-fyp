@@ -110,7 +110,7 @@ const VisualizationOption: React.FC = () => {
           <div className="max-w-7xl mx-auto px-0">
             <div className="grid grid-cols-1 lg:grid-cols-12">
               {/* Left: text box */}
-              <div className="lg:col-span-7 col-span-1 px-3">
+              <div className="lg:col-span-7 col-span-1 px-3 order-2 lg:order-1">
                 <div className="min-h-fit sm:min-h-[20rem] lg:h-[22rem] w-full bg-white border-r border-emerald-100 p-6 sm:p-8 flex flex-col justify-between">
                   <div>
                     <h1 className="text-1xl sm:text-3xl lg:text-4xl mt-2 font-extrabold leading-tight text-emerald-900">
@@ -161,7 +161,7 @@ const VisualizationOption: React.FC = () => {
               </div>
 
               {/* Right: hero image */}
-              <div className="lg:col-span-5 col-span-1 border-2">
+              <div className="lg:col-span-5 col-span-1 border-2 order-1 lg:order-2">
                 <div className="min-h-fit sm:min-h-[20rem] lg:h-[22rem] w-full bg-gray-100 flex items-stretch justify-center overflow-hidden">
                   <img
                     src={HERO_CENTER_IMG}
