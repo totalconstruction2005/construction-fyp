@@ -3,7 +3,11 @@ import { CURRENT_USER, USER_TOKEN } from "@shared/constants/storageKeys";
 
 export const AUTH_LOGOUT_EVENT = "auth:logout";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+if (!API_BASE_URL) {
+  throw new Error("VITE_API_BASE_URL is not defined. Set it in construction-client/.env or the environment.");
+}
 
 type ApiRequestOptions = Omit<RequestInit, "body" | "headers"> & {
   headers?: Record<string, string>;

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import ErrorAlert from "@shared/components/ErrorAlert";
 import { getUserFriendlyMessage } from "@shared/utils/errorHandler";
 import { getAllMapRequests, updateMapRequestStatus } from "@shared/api/mapRequestService";
+import { API_BASE_URL } from "@shared/api/apiClient";
 import { USER_TOKEN } from "@shared/constants/storageKeys";
 
 type MapRequestStatus = "Pending" | "Contacted" | "In Progress" | "Completed";
@@ -107,7 +108,6 @@ const ImagePreviewModal: React.FC<{ imageUrl: string; onClose: () => void }> = (
 };
 
 const MapRequestDetails: React.FC = () => {
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [request, setRequest] = useState<MapRequestDetailsData | null>(null);
