@@ -8,470 +8,260 @@ import {
 
 type ContractorPlan = {
   _id: string;
-
   title: string;
   slug: string;
-
   badge: string;
   subtitle: string;
-
   price: number;
   currency: string;
   priceUnit: string;
-
   estimateText: string;
-
   description: string;
-
   includedFeatures: string[];
-
   excludedFeatures: string[];
-
   timeline: string;
-
   idealFor: string;
-
   buttonText: string;
-
   recommended: boolean;
-
   theme: "green" | "dark" | "gold" | "gray";
-
   isActive: boolean;
-
   sortOrder: number;
-
   createdAt?: string;
-
   updatedAt?: string;
 };
 
 const ContractorPlansAdmin: React.FC = () => {
-
   const navigate = useNavigate();
-
   const [plans, setPlans] = useState<ContractorPlan[]>([]);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-
     const fetchPlans = async () => {
-
       try {
-
         const data = await getContractorPlans();
-
         setPlans(Array.isArray(data) ? data : []);
-
       } catch (err: any) {
-
         console.error(err);
-
-        setError(
-          err?.message || "Failed to load contractor plans."
-        );
-
+        setError(err?.message || "Failed to load contractor plans.");
       } finally {
-
         setLoading(false);
-
       }
-
     };
-
     fetchPlans();
-
   }, []);
 
   const handleMoveUp = async (index: number) => {
-
     if (index === 0) return;
-
     const reordered = [...plans];
-
-    [reordered[index], reordered[index - 1]] = [
-      reordered[index - 1],
-      reordered[index],
-    ];
-
+    [reordered[index], reordered[index - 1]] = [reordered[index - 1], reordered[index]];
     setPlans(reordered);
-
     try {
-
-      await reorderContractorPlans(
-        reordered.map((p) => p._id)
-      );
-
+      await reorderContractorPlans(reordered.map((p) => p._id));
     } catch {
-
       setError("Failed to reorder plans.");
-
     }
-
   };
 
   const handleMoveDown = async (index: number) => {
-
     if (index === plans.length - 1) return;
-
     const reordered = [...plans];
-
-    [reordered[index], reordered[index + 1]] = [
-      reordered[index + 1],
-      reordered[index],
-    ];
-
+    [reordered[index], reordered[index + 1]] = [reordered[index + 1], reordered[index]];
     setPlans(reordered);
-
     try {
-
-      await reorderContractorPlans(
-        reordered.map((p) => p._id)
-      );
-
+      await reorderContractorPlans(reordered.map((p) => p._id));
     } catch {
-
       setError("Failed to reorder plans.");
-
     }
-
   };
 
   const handleDelete = async (id: string) => {
-
-    if (
-      !window.confirm(
-        "Are you sure you want to delete this plan?"
-      )
-    )
-      return;
-
+    if (!window.confirm("Are you sure you want to delete this plan?")) return;
     try {
-
       await deleteContractorPlan(id);
-
-      setPlans((prev) =>
-        prev.filter((p) => p._id !== id)
-      );
-
+      setPlans((prev) => prev.filter((p) => p._id !== id));
     } catch {
-
       setError("Failed to delete plan.");
-
     }
-
   };
 
   const handleEdit = (plan: ContractorPlan) => {
-
-    navigate(
-      "/admin/settings/contractor-plans/add",
-      {
-        state: {
-          plan,
-        },
-      }
-    );
-
+    navigate("/admin/settings/contractor-plans/add", { state: { plan } });
   };
 
-  const getThemeColor = (theme: string) => {
-
+  /* Badge strip color per theme */
+  const getBadgeStyle = (theme: string) => {
     switch (theme) {
-
-      case "gold":
-        return "bg-yellow-100 text-yellow-700";
-
-      case "dark":
-        return "bg-gray-800 text-white";
-
-      case "gray":
-        return "bg-gray-200 text-gray-700";
-
-      default:
-        return "bg-green-100 text-green-700";
-
+      case "gold":   return "bg-yellow-500 text-white";
+      case "dark":   return "bg-gray-800 text-white";
+      case "gray":   return "bg-gray-500 text-white";
+      default:       return "bg-[#1b5e35] text-white";
     }
-
   };
 
   if (loading) {
-
     return (
-
       <div className="flex justify-center items-center h-64">
-
-        Loading...
-
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-green-700" />
+          <p className="mt-3 text-sm text-gray-500">Loading plans…</p>
+        </div>
       </div>
-
     );
-
   }
 
-    return (
+  return (
     <>
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
-
+      {/* ── Page header ── */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7 mb-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-
           <div>
-
-            <p className="uppercase tracking-widest text-sm text-green-700 font-semibold">
+            <p className="text-[11px] uppercase tracking-widest font-bold text-[#1b5e35]">
               Settings
             </p>
-
-            <h1 className="text-3xl font-bold text-gray-900 mt-2">
+            <h1 className="text-3xl font-bold text-gray-900 mt-1">
               Contractor Plans
             </h1>
-
-            <p className="text-gray-500 mt-2">
+            <p className="text-gray-400 text-sm mt-1">
               Manage contractor pricing packages.
             </p>
-
           </div>
-
           <button
-            onClick={() =>
-              navigate("/admin/settings/contractor-plans/add")
-            }
-            className="px-5 py-3 rounded-xl bg-green-700 hover:bg-green-800 text-white font-semibold"
+            onClick={() => navigate("/admin/settings/contractor-plans/add")}
+            className="px-6 py-3 rounded-xl bg-[#1b5e35] hover:bg-[#154d2b] text-white text-sm font-semibold transition-colors"
           >
-            Add Contractor Plan
+            + Add Contractor Plan
           </button>
-
         </div>
-
       </div>
 
+      {/* ── Error banner ── */}
       {error && (
-
-        <div className="mb-5 bg-red-100 border border-red-300 rounded-lg p-4 text-red-700">
-
+        <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-600">
           {error}
-
         </div>
-
       )}
 
+      {/* ── Plan cards ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-
         {plans.map((plan, index) => (
-
           <div
             key={plan._id}
-            className="rounded-3xl bg-white shadow-lg border overflow-hidden"
+            className="rounded-2xl bg-white shadow-md border border-gray-100 overflow-hidden flex flex-col"
           >
-
+            {/* Colored badge strip */}
             <div
-              className={`px-5 py-3 flex justify-between items-center ${getThemeColor(
-                plan.theme
-              )}`}
+              className={`px-5 py-3 flex justify-between items-center ${getBadgeStyle(plan.theme)}`}
             >
-
-              <span className="font-bold uppercase">
-
+              <span className="text-[11px] font-bold uppercase tracking-widest">
                 {plan.badge || "Package"}
-
               </span>
-
-              <span className="text-xs">
-
+              <span className="text-[11px] font-semibold opacity-80">
                 #{index + 1}
-
               </span>
-
             </div>
 
-            <div className="p-6">
+            <div className="p-6 flex flex-col flex-1">
 
-              <div className="flex justify-between items-start">
-
+              {/* Title row */}
+              <div className="flex justify-between items-start gap-3">
                 <div>
-
-                  <h2 className="text-2xl font-bold">
-
+                  <h2 className="text-xl font-bold text-gray-900 leading-tight">
                     {plan.title}
-
                   </h2>
-
-                  <p className="text-gray-500 mt-1">
-
-                    {plan.subtitle}
-
-                  </p>
-
+                  <p className="text-sm text-gray-400 mt-0.5">{plan.subtitle}</p>
                 </div>
-
                 <span
-                  className={`text-xs px-3 py-1 rounded-full font-semibold ${
+                  className={`text-[11px] px-3 py-1 rounded-full font-semibold flex-shrink-0 ${
                     plan.isActive
-                      ? "bg-green-100 text-green-700"
-                      : "bg-gray-200 text-gray-600"
+                      ? "bg-green-100 text-[#1b5e35]"
+                      : "bg-gray-100 text-gray-500"
                   }`}
                 >
                   {plan.isActive ? "Active" : "Inactive"}
                 </span>
-
               </div>
 
-              <div className="mt-6">
-
-                <div className="flex items-end gap-1">
-
-                  <span className="text-lg">
-
-                    {plan.currency}
-
-                  </span>
-
-                  <span className="text-4xl font-bold">
-
-                    {plan.price.toLocaleString()}
-
-                  </span>
-
-                </div>
-
-                <p className="text-gray-500">
-
-                  {plan.priceUnit}
-
-                </p>
-
+              {/* Price */}
+              <div className="mt-5 flex items-baseline gap-1.5">
+                <span className="text-base font-bold text-gray-900">{plan.currency}</span>
+                <span className="text-4xl font-extrabold text-gray-900 leading-none">
+                  {plan.price.toLocaleString()}
+                </span>
+                <span className="text-sm text-gray-400 ml-1">{plan.priceUnit}</span>
               </div>
 
               {plan.estimateText && (
-
-                <p className="mt-4 italic text-sm text-gray-500">
-
-                  {plan.estimateText}
-
-                </p>
-
+                <p className="mt-1.5 text-xs italic text-gray-400">{plan.estimateText}</p>
               )}
 
               {plan.description && (
-
-                <p className="mt-5 text-gray-700 line-clamp-3">
-
+                <p className="mt-4 text-sm text-gray-600 leading-5 line-clamp-3">
                   {plan.description}
-
                 </p>
-
               )}
 
-              <div className="mt-6 space-y-3">
-
-                <div className="flex justify-between">
-
-                  <span className="font-medium">
-
-                    Included Features
-
-                  </span>
-
-                  <span className="font-bold text-green-700">
-
+              {/* Feature counts & timeline */}
+              <div className="mt-5 space-y-2 border-t border-gray-100 pt-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">Included Features</span>
+                  <span className="text-sm font-bold text-[#1b5e35]">
                     {plan.includedFeatures?.length ?? 0}
-
                   </span>
-
                 </div>
-
-                <div className="flex justify-between">
-
-                  <span className="font-medium">
-
-                    Excluded Features
-
-                  </span>
-
-                  <span className="font-bold text-red-600">
-
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">Excluded Features</span>
+                  <span className="text-sm font-bold text-red-500">
                     {plan.excludedFeatures?.length ?? 0}
-
                   </span>
-
                 </div>
-
-                <div className="flex justify-between">
-
-                  <span className="font-medium">
-
-                    Timeline
-
-                  </span>
-
-                  <span>
-
-                    {plan.timeline}
-
-                  </span>
-
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">Timeline</span>
+                  <span className="text-sm text-gray-700">{plan.timeline}</span>
                 </div>
-
               </div>
 
-              <div className="mt-6">
-
-                <p className="font-semibold">
-
+              {/* Ideal For */}
+              <div className="mt-4">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-1">
                   Ideal For
-
                 </p>
-
-                <p className="text-gray-600 mt-1 line-clamp-2">
-
-                  {plan.idealFor}
-
-                </p>
-
+                <p className="text-sm text-gray-600 line-clamp-2">{plan.idealFor}</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 mt-8">
-
+              {/* Action buttons */}
+              <div className="grid grid-cols-2 gap-2 mt-6">
                 <button
                   onClick={() => handleMoveUp(index)}
                   disabled={index === 0}
-                  className="py-2 rounded-lg border hover:bg-gray-100 disabled:opacity-40"
+                  className="py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-30 transition-colors"
                 >
                   ↑ Move Up
                 </button>
-
                 <button
                   onClick={() => handleMoveDown(index)}
                   disabled={index === plans.length - 1}
-                  className="py-2 rounded-lg border hover:bg-gray-100 disabled:opacity-40"
+                  className="py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-30 transition-colors"
                 >
                   ↓ Move Down
                 </button>
-
                 <button
                   onClick={() => handleEdit(plan)}
-                  className="py-2 rounded-lg bg-green-700 hover:bg-green-800 text-white font-semibold"
+                  className="py-2.5 rounded-xl bg-[#1b5e35] hover:bg-[#154d2b] text-white text-sm font-semibold transition-colors"
                 >
                   Edit
                 </button>
-
                 <button
                   onClick={() => handleDelete(plan._id)}
-                  className="py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold"
+                  className="py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition-colors"
                 >
                   Delete
                 </button>
-
               </div>
 
             </div>
-
           </div>
-
         ))}
-
       </div>
     </>
   );
