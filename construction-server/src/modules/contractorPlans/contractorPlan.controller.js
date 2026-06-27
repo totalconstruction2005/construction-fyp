@@ -11,14 +11,17 @@ const toSlug = (value) => {
     .replace(/(^-|-$)+/g, "");
 };
 
-const sendResponse = (res, status, payload) => res.status(status).json(payload);
+const sendResponse = (res, status, payload) =>
+  res.status(status).json(payload);
 
 const handleError = (res, error, defaultMessage) => {
-  console.error("Error occurred:", error.message);
-  
-  // Mongoose validation error
+  console.error(error);
+
   if (error.name === "ValidationError") {
-    const messages = Object.values(error.errors).map(err => err.message);
+    const messages = Object.values(error.errors).map(
+      (err) => err.message
+    );
+
     return sendResponse(res, 400, {
       success: false,
       message: messages.join(", "),
@@ -26,43 +29,58 @@ const handleError = (res, error, defaultMessage) => {
     });
   }
 
-  // Duplicate key error (unique constraint)
   if (error.code === 11000) {
-    const field = Object.keys(error.keyPattern)[0];
     return sendResponse(res, 400, {
       success: false,
-      message: `A plan with this ${field} already exists`,
+      message: "Plan title already exists.",
       data: null,
     });
   }
 
-  // Invalid ObjectId format
   if (error.name === "CastError") {
     return sendResponse(res, 400, {
       success: false,
-      message: "Invalid ID format",
+      message: "Invalid ID.",
       data: null,
     });
   }
 
-  // Default server error
-  console.error("Unexpected error:", error);
   return sendResponse(res, 500, {
     success: false,
-    message: defaultMessage || "Internal server error",
+    message: defaultMessage,
     data: null,
   });
 };
 
+/* ===========================================
+   CREATE PLAN
+=========================================== */
+
 exports.createPlan = async (req, res) => {
   try {
-    const { title, price, currency, tagline, features, isActive } = req.body;
+    const {
+      title,
+      badge,
+      subtitle,
+      price,
+      currency,
+      priceUnit,
+      estimateText,
+      description,
+      includedFeatures,
+      excludedFeatures,
+      timeline,
+      idealFor,
+      buttonText,
+      recommended,
+      theme,
+      isActive,
+    } = req.body;
 
-    // Validate required fields
     if (!title || !title.trim()) {
       return sendResponse(res, 400, {
         success: false,
-        message: "Title is required",
+        message: "Title is required.",
         data: null,
       });
     }
@@ -70,46 +88,101 @@ exports.createPlan = async (req, res) => {
     if (price === undefined || price === null || price < 0) {
       return sendResponse(res, 400, {
         success: false,
-        message: "Valid price is required (must be 0 or greater)",
+        message: "Valid price is required.",
         data: null,
       });
     }
 
-    // Validate features array if provided
-    if (features && !Array.isArray(features)) {
+    if (
+      includedFeatures &&
+      !Array.isArray(includedFeatures)
+    ) {
       return sendResponse(res, 400, {
         success: false,
-        message: "Features must be an array",
+        message: "includedFeatures must be an array.",
         data: null,
       });
     }
 
-    // Create plan
+    if (
+      excludedFeatures &&
+      !Array.isArray(excludedFeatures)
+    ) {
+      return sendResponse(res, 400, {
+        success: false,
+        message: "excludedFeatures must be an array.",
+        data: null,
+      });
+    }
+
     const plan = await ContractorPlan.create({
       title: title.trim(),
+
+      badge: badge || "",
+
+      subtitle: subtitle || "",
+
       price,
-      currency: currency || "PKR",
-      tagline: tagline?.trim() || "",
-      features: features || [],
-      isActive: isActive !== undefined ? isActive : true,
+
+      currency: currency || "Rs.",
+
+      priceUnit: priceUnit || "per sq ft",
+
+      estimateText: estimateText || "",
+
+      description: description || "",
+
+      includedFeatures: includedFeatures || [],
+
+      excludedFeatures: excludedFeatures || [],
+
+      timeline: timeline || "",
+
+      idealFor: idealFor || "",
+
+      buttonText: buttonText || "Select Package",
+
+      recommended:
+        recommended !== undefined
+          ? recommended
+          : false,
+
+      theme: theme || "green",
+
+      isActive:
+        isActive !== undefined
+          ? isActive
+          : true,
     });
 
     return sendResponse(res, 201, {
       success: true,
-      message: "Contractor plan created successfully",
+      message: "Plan created successfully.",
       data: plan,
     });
   } catch (error) {
-    return handleError(res, error, "Failed to create contractor plan");
+    return handleError(
+      res,
+      error,
+      "Failed to create contractor plan."
+    );
   }
 };
 
+/* ===========================================
+   GET ALL PLANS
+=========================================== */
+
 exports.getAllPlans = async (req, res) => {
   try {
-    // Admin users can see all plans (active and inactive)
-    // Regular users and unauthenticated users only see active plans
-    const isAdmin = req.user && req.user.role === "admin";
-    const filter = isAdmin ? {} : { isActive: true };
+
+    const isAdmin =
+      req.user &&
+      req.user.role === "admin";
+
+    const filter = isAdmin
+      ? {}
+      : { isActive: true };
 
     const plans = await ContractorPlan.find(filter)
       .sort({ sortOrder: 1 })
@@ -117,191 +190,230 @@ exports.getAllPlans = async (req, res) => {
 
     return sendResponse(res, 200, {
       success: true,
-      message: "Contractor plans fetched successfully",
+      message: "Plans fetched successfully.",
       data: plans,
     });
+
   } catch (error) {
-    return handleError(res, error, "Failed to fetch contractor plans");
+    return handleError(
+      res,
+      error,
+      "Failed to fetch plans."
+    );
   }
 };
+
+/* ===========================================
+   UPDATE PLAN
+=========================================== */
 
 exports.updatePlan = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return sendResponse(res, 400, {
         success: false,
-        message: "Invalid plan ID format",
+        message: "Invalid plan ID.",
         data: null,
       });
     }
 
     const updateData = { ...req.body };
 
-    // Validate price if provided
-    if (updateData.price !== undefined && updateData.price < 0) {
+    if (
+      updateData.title !== undefined &&
+      !updateData.title.trim()
+    ) {
       return sendResponse(res, 400, {
         success: false,
-        message: "Price must be 0 or greater",
+        message: "Title cannot be empty.",
         data: null,
       });
     }
 
-    // Validate title if provided
-    if (updateData.title !== undefined && !updateData.title.trim()) {
+    if (
+      updateData.price !== undefined &&
+      updateData.price < 0
+    ) {
       return sendResponse(res, 400, {
         success: false,
-        message: "Title cannot be empty",
+        message: "Price must be greater than or equal to 0.",
         data: null,
       });
     }
 
-    // Validate features if provided
-    if (updateData.features !== undefined && !Array.isArray(updateData.features)) {
+    if (
+      updateData.includedFeatures &&
+      !Array.isArray(updateData.includedFeatures)
+    ) {
       return sendResponse(res, 400, {
         success: false,
-        message: "Features must be an array",
+        message: "includedFeatures must be an array.",
         data: null,
       });
     }
 
-    // Trim title and tagline
-    if (updateData.title) updateData.title = updateData.title.trim();
-    if (updateData.tagline) updateData.tagline = updateData.tagline.trim();
+    if (
+      updateData.excludedFeatures &&
+      !Array.isArray(updateData.excludedFeatures)
+    ) {
+      return sendResponse(res, 400, {
+        success: false,
+        message: "excludedFeatures must be an array.",
+        data: null,
+      });
+    }
 
-    // Check for duplicate title/slug
     if (updateData.title) {
+      updateData.title = updateData.title.trim();
       updateData.slug = toSlug(updateData.title);
 
-      const existingPlan = await ContractorPlan.findOne({
-        slug: updateData.slug,
-        _id: { $ne: id },
-      }).lean();
+      const existingPlan =
+        await ContractorPlan.findOne({
+          slug: updateData.slug,
+          _id: { $ne: id },
+        });
 
       if (existingPlan) {
         return sendResponse(res, 400, {
           success: false,
-          message: "A plan with this title already exists",
+          message: "Plan title already exists.",
           data: null,
         });
       }
     }
 
-    // Update plan
-    const updatedPlan = await ContractorPlan.findByIdAndUpdate(id, updateData, {
-      returnDocument: 'after',
-      runValidators: true,
-    });
+    const updatedPlan =
+      await ContractorPlan.findByIdAndUpdate(
+        id,
+        updateData,
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
 
     if (!updatedPlan) {
       return sendResponse(res, 404, {
         success: false,
-        message: "Contractor plan not found",
+        message: "Plan not found.",
         data: null,
       });
     }
 
     return sendResponse(res, 200, {
       success: true,
-      message: "Contractor plan updated successfully",
+      message: "Plan updated successfully.",
       data: updatedPlan,
     });
+
   } catch (error) {
-    return handleError(res, error, "Failed to update contractor plan");
+    return handleError(
+      res,
+      error,
+      "Failed to update contractor plan."
+    );
   }
 };
 
+/* ===========================================
+   DELETE PLAN
+=========================================== */
+
 exports.deletePlan = async (req, res) => {
+
   try {
+
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return sendResponse(res, 400, {
-        success: false,
-        message: "Invalid plan ID format",
-        data: null,
+
+      return sendResponse(res,400,{
+        success:false,
+        message:"Invalid plan ID.",
+        data:null
       });
+
     }
 
-    const deletedPlan = await ContractorPlan.findByIdAndDelete(id);
+    const deleted =
+      await ContractorPlan.findByIdAndDelete(id);
 
-    if (!deletedPlan) {
-      return sendResponse(res, 404, {
-        success: false,
-        message: "Contractor plan not found",
-        data: null,
+    if (!deleted) {
+
+      return sendResponse(res,404,{
+        success:false,
+        message:"Plan not found.",
+        data:null
       });
+
     }
 
-    return sendResponse(res, 200, {
-      success: true,
-      message: "Contractor plan deleted successfully",
-      data: null,
+    return sendResponse(res,200,{
+      success:true,
+      message:"Plan deleted successfully.",
+      data:null
     });
+
   } catch (error) {
-    return handleError(res, error, "Failed to delete contractor plan");
+
+    return handleError(
+      res,
+      error,
+      "Failed to delete contractor plan."
+    );
+
   }
+
 };
 
-exports.reorderPlans = async (req, res) => {
-  try {
-    const { orderedIds } = req.body;
 
-    // Validate orderedIds
-    if (!Array.isArray(orderedIds)) {
-      return sendResponse(res, 400, {
-        success: false,
-        message: "orderedIds must be an array",
-        data: null,
-      });
-    }
+/* ===========================================
+   REORDER PLANS
+=========================================== */
 
-    if (orderedIds.length === 0) {
-      return sendResponse(res, 400, {
-        success: false,
-        message: "orderedIds cannot be empty",
-        data: null,
-      });
-    }
+exports.reorderPlans = async (req,res)=>{
 
-    // Validate all IDs are valid ObjectIds
-    const invalidIds = orderedIds.filter(id => !mongoose.Types.ObjectId.isValid(id));
-    if (invalidIds.length > 0) {
-      return sendResponse(res, 400, {
-        success: false,
-        message: "Invalid plan IDs found in orderedIds",
-        data: null,
-      });
-    }
+try{
 
-    // Build bulk operations
-    const bulkOps = orderedIds.map((id, index) => ({
-      updateOne: {
-        filter: { _id: id },
-        update: { sortOrder: index },
-      },
-    }));
+const {orderedIds}=req.body;
 
-    // Execute bulk update
-    const result = await ContractorPlan.bulkWrite(bulkOps);
+if(!Array.isArray(orderedIds)){
 
-    // Check if any plans were actually updated
-    if (result.modifiedCount === 0) {
-      return sendResponse(res, 404, {
-        success: false,
-        message: "No plans were updated. Check if the provided IDs exist.",
-        data: null,
-      });
-    }
+return sendResponse(res,400,{
+success:false,
+message:"orderedIds must be an array.",
+data:null
+});
 
-    return sendResponse(res, 200, {
-      success: true,
-      message: `Successfully reordered ${result.modifiedCount} plan(s)`,
-      data: null,
-    });
-  } catch (error) {
-    return handleError(res, error, "Failed to reorder contractor plans");
-  }
+}
+
+const bulkOps=orderedIds.map((id,index)=>({
+
+updateOne:{
+filter:{_id:id},
+update:{sortOrder:index}
+}
+
+}));
+
+await ContractorPlan.bulkWrite(bulkOps);
+
+return sendResponse(res,200,{
+success:true,
+message:"Plans reordered successfully.",
+data:null
+});
+
+}catch(error){
+
+return handleError(
+res,
+error,
+"Failed to reorder plans."
+);
+
+}
+
 };

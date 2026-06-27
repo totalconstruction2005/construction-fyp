@@ -1,17 +1,37 @@
 import React, { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { createContractorPlan, updateContractorPlan } from "../../../shared/api/contractorPlanService";
+import {
+  createContractorPlan,
+  updateContractorPlan,
+} from "../../../shared/api/contractorPlanService";
 
 type ContractorPlan = {
   _id?: string;
+
   title: string;
+  badge: string;
+  subtitle: string;
+
   price: number;
   currency: string;
-  tagline: string;
-  features: string[];
+  priceUnit: string;
+
+  estimateText: string;
+  description: string;
+
+  includedFeatures: string[];
+  excludedFeatures: string[];
+
+  timeline: string;
+  idealFor: string;
+
+  buttonText: string;
+
+  recommended: boolean;
+
+  theme: "green" | "dark" | "gold" | "gray";
+
   isActive: boolean;
-  createdAt?: string;
-  updatedAt?: string;
 };
 
 type LocationState = {
@@ -21,192 +41,463 @@ type LocationState = {
 const AddContractorPlan: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
   const state = location.state as LocationState | undefined;
+
   const existingPlan = state?.plan;
 
   const [title, setTitle] = useState(existingPlan?.title ?? "");
-  const [price, setPrice] = useState<number>(existingPlan?.price ?? 0);
-  const [currency, setCurrency] = useState(existingPlan?.currency ?? "PKR");
-  const [tagline, setTagline] = useState(existingPlan?.tagline ?? "");
-  const [featuresText, setFeaturesText] = useState(
-    existingPlan?.features.join("\n") ?? ""
+  const [badge, setBadge] = useState(existingPlan?.badge ?? "");
+  const [subtitle, setSubtitle] = useState(existingPlan?.subtitle ?? "");
+
+  const [price, setPrice] = useState(existingPlan?.price ?? 0);
+  const [currency, setCurrency] = useState(
+    existingPlan?.currency ?? "Rs."
   );
-  const [isActive, setIsActive] = useState(existingPlan?.isActive ?? true);
+
+  const [priceUnit, setPriceUnit] = useState(
+    existingPlan?.priceUnit ?? "per sq ft"
+  );
+
+  const [estimateText, setEstimateText] = useState(
+    existingPlan?.estimateText ?? ""
+  );
+
+  const [description, setDescription] = useState(
+    existingPlan?.description ?? ""
+  );
+
+  const [includedText, setIncludedText] = useState(
+    existingPlan?.includedFeatures?.join("\n") ?? ""
+  );
+
+  const [excludedText, setExcludedText] = useState(
+    existingPlan?.excludedFeatures?.join("\n") ?? ""
+  );
+
+  const [timeline, setTimeline] = useState(
+    existingPlan?.timeline ?? ""
+  );
+
+  const [idealFor, setIdealFor] = useState(
+    existingPlan?.idealFor ?? ""
+  );
+
+  const [buttonText, setButtonText] = useState(
+    existingPlan?.buttonText ?? "Select Package"
+  );
+
+  const [recommended, setRecommended] = useState(
+    existingPlan?.recommended ?? false
+  );
+
+  const [theme, setTheme] = useState<
+    "green" | "dark" | "gold" | "gray"
+  >(existingPlan?.theme ?? "green");
+
+  const [isActive, setIsActive] = useState(
+    existingPlan?.isActive ?? true
+  );
+
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string>("");
 
-  const isEditing = useMemo(() => Boolean(existingPlan), [existingPlan]);
+  const [error, setError] = useState("");
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const isEditing = useMemo(
+    () => Boolean(existingPlan),
+    [existingPlan]
+  );
+
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+
     setError("");
 
-    const trimmedTitle = title.trim();
-
-    if (!trimmedTitle || price <= 0) {
-      setError("Please provide a valid title and price greater than 0.");
+    if (!title.trim()) {
+      setError("Title is required.");
       return;
     }
 
-    const features = featuresText
-      .split("\n")
-      .map((line) => line.trim())
-      .filter(Boolean);
-
     const planData = {
-      title: trimmedTitle,
+      title,
+
+      badge,
+
+      subtitle,
+
       price: Number(price),
+
       currency,
-      tagline: tagline.trim(),
-      features,
+
+      priceUnit,
+
+      estimateText,
+
+      description,
+
+      includedFeatures: includedText
+        .split("\n")
+        .map((x) => x.trim())
+        .filter(Boolean),
+
+      excludedFeatures: excludedText
+        .split("\n")
+        .map((x) => x.trim())
+        .filter(Boolean),
+
+      timeline,
+
+      idealFor,
+
+      buttonText,
+
+      recommended,
+
+      theme,
+
       isActive,
     };
 
     try {
       setIsLoading(true);
-      
+
       if (isEditing && existingPlan?._id) {
-        await updateContractorPlan(existingPlan._id, planData);
+        await updateContractorPlan(
+          existingPlan._id,
+          planData
+        );
       } else {
         await createContractorPlan(planData);
       }
-      
+
       navigate("/admin/settings/contractor-plans");
     } catch (err: any) {
-      console.error("Error saving plan:", err);
-      setError(err?.message || (err instanceof Error ? err.message : "Failed to save plan. Please try again."));
+      setError(
+        err?.message || "Failed to save plan."
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <>
-      <div className="bg-white/70 backdrop-blur rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
-        <p className="text-xs uppercase tracking-[0.2em] text-emerald-700 font-semibold">Settings</p>
-        <h1 className="text-3xl font-bold text-gray-900 mt-1">
-          {isEditing ? "Edit Contractor Plan" : "Add Contractor Plan"}
-        </h1>
-        <p className="text-sm text-gray-600 mt-2">Create or update plan details for customers.</p>
+  <>
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
+      <p className="text-xs uppercase tracking-[0.2em] text-emerald-700 font-semibold">
+        Settings
+      </p>
+
+      <h1 className="text-3xl font-bold text-gray-900 mt-1">
+        {isEditing ? "Edit Contractor Plan" : "Add Contractor Plan"}
+      </h1>
+
+      <p className="text-sm text-gray-600 mt-2">
+        Create contractor pricing packages.
+      </p>
+    </div>
+
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6"
+    >
+      {error && (
+        <div className="bg-red-100 text-red-700 p-3 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      {/* BASIC DETAILS */}
+
+      <div className="grid md:grid-cols-2 gap-5">
+
+        <div>
+          <label className="font-semibold">Title</label>
+
+          <input
+            className="w-full mt-2 border rounded-xl p-3"
+            value={title}
+            onChange={(e)=>setTitle(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label className="font-semibold">Badge</label>
+
+          <input
+            className="w-full mt-2 border rounded-xl p-3"
+            placeholder="MOST AFFORDABLE"
+            value={badge}
+            onChange={(e)=>setBadge(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label className="font-semibold">Subtitle</label>
+
+          <input
+            className="w-full mt-2 border rounded-xl p-3"
+            placeholder="Foundation to Roof Slab"
+            value={subtitle}
+            onChange={(e)=>setSubtitle(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label className="font-semibold">Price</label>
+
+          <input
+            type="number"
+            className="w-full mt-2 border rounded-xl p-3"
+            value={price}
+            onChange={(e)=>setPrice(Number(e.target.value))}
+          />
+        </div>
+
+        <div>
+          <label className="font-semibold">Currency</label>
+
+          <input
+            className="w-full mt-2 border rounded-xl p-3"
+            value={currency}
+            onChange={(e)=>setCurrency(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label className="font-semibold">Price Unit</label>
+
+          <input
+            className="w-full mt-2 border rounded-xl p-3"
+            value={priceUnit}
+            onChange={(e)=>setPriceUnit(e.target.value)}
+          />
+        </div>
+
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5 max-w-3xl"
-      >
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-            {error}
-          </div>
-        )}
+      {/* DESCRIPTION */}
+
+      <div>
+
+        <label className="font-semibold">
+
+          Estimate Text
+
+        </label>
+
+        <input
+          className="w-full mt-2 border rounded-xl p-3"
+          value={estimateText}
+          onChange={(e)=>setEstimateText(e.target.value)}
+        />
+
+      </div>
+
+      <div>
+
+        <label className="font-semibold">
+
+          Description
+
+        </label>
+
+        <textarea
+          rows={4}
+          className="w-full mt-2 border rounded-xl p-3"
+          value={description}
+          onChange={(e)=>setDescription(e.target.value)}
+        />
+
+      </div>
+
+      {/* FEATURES */}
+
+      <div className="grid md:grid-cols-2 gap-6">
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="plan-title">
-            Title
-          </label>
-          <input
-            id="plan-title"
-            type="text"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 placeholder:text-gray-400"
-            placeholder="Enter plan title"
-          />
-        </div>
 
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="plan-price">
-            Price
-          </label>
-          <input
-            id="plan-price"
-            type="number"
-            min="0"
-            step="1"
-            value={price}
-            onChange={(event) => setPrice(Number(event.target.value))}
-            className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 placeholder:text-gray-400"
-            placeholder="50000"
-          />
-        </div>
+          <label className="font-semibold">
 
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="plan-currency">
-            Currency
-          </label>
-          <select
-            id="plan-currency"
-            value={currency}
-            onChange={(event) => setCurrency(event.target.value)}
-            className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200"
-          >
-            <option value="PKR">PKR</option>
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-          </select>
-        </div>
+            Included Features
+            <span className="text-sm text-gray-500">
+              (one per line)
+            </span>
 
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="plan-tagline">
-            Tagline
           </label>
-          <input
-            id="plan-tagline"
-            type="text"
-            value={tagline}
-            onChange={(event) => setTagline(event.target.value)}
-            className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 placeholder:text-gray-400"
-            placeholder="Short description"
-          />
-        </div>
 
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="plan-features">
-            Features (one per line)
-          </label>
           <textarea
-            id="plan-features"
-            rows={5}
-            value={featuresText}
-            onChange={(event) => setFeaturesText(event.target.value)}
-            className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 placeholder:text-gray-400"
-            placeholder="Up to 5 site visits"
+            rows={8}
+            className="w-full mt-2 border rounded-xl p-3"
+            value={includedText}
+            onChange={(e)=>setIncludedText(e.target.value)}
           />
+
         </div>
 
-        <div className="flex items-center gap-2">
+        <div>
+
+          <label className="font-semibold">
+
+            Excluded Features
+            <span className="text-sm text-gray-500">
+              (one per line)
+            </span>
+
+          </label>
+
+          <textarea
+            rows={8}
+            className="w-full mt-2 border rounded-xl p-3"
+            value={excludedText}
+            onChange={(e)=>setExcludedText(e.target.value)}
+          />
+
+        </div>
+
+      </div>
+
+      {/* FOOTER */}
+
+      <div className="grid md:grid-cols-2 gap-5">
+
+        <div>
+
+          <label className="font-semibold">
+
+            Timeline
+
+          </label>
+
           <input
-            id="plan-isActive"
+            className="w-full mt-2 border rounded-xl p-3"
+            value={timeline}
+            onChange={(e)=>setTimeline(e.target.value)}
+          />
+
+        </div>
+
+        <div>
+
+          <label className="font-semibold">
+
+            Button Text
+
+          </label>
+
+          <input
+            className="w-full mt-2 border rounded-xl p-3"
+            value={buttonText}
+            onChange={(e)=>setButtonText(e.target.value)}
+          />
+
+        </div>
+
+      </div>
+
+      <div>
+
+        <label className="font-semibold">
+
+          Ideal For
+
+        </label>
+
+        <textarea
+          rows={3}
+          className="w-full mt-2 border rounded-xl p-3"
+          value={idealFor}
+          onChange={(e)=>setIdealFor(e.target.value)}
+        />
+
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-5">
+
+        <div>
+
+          <label className="font-semibold">
+
+            Theme
+
+          </label>
+
+          <select
+            className="w-full mt-2 border rounded-xl p-3"
+            value={theme}
+            onChange={(e)=>setTheme(e.target.value as any)}
+          >
+            <option value="green">Green</option>
+            <option value="dark">Dark</option>
+            <option value="gold">Gold</option>
+            <option value="gray">Gray</option>
+          </select>
+
+        </div>
+
+        <div className="flex items-center gap-3 mt-8">
+
+          <input
+            type="checkbox"
+            checked={recommended}
+            onChange={(e)=>setRecommended(e.target.checked)}
+          />
+
+          <label>
+
+            Recommended Package
+
+          </label>
+
+        </div>
+
+        <div className="flex items-center gap-3 mt-8">
+
+          <input
             type="checkbox"
             checked={isActive}
-            onChange={(event) => setIsActive(event.target.checked)}
-            className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-200"
+            onChange={(e)=>setIsActive(e.target.checked)}
           />
-          <label className="text-sm font-semibold text-gray-700" htmlFor="plan-isActive">
-            Active (visible to customers)
+
+          <label>
+
+            Active
+
           </label>
+
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-sm transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? "Saving..." : isEditing ? "Save Changes" : "Add Plan"}
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate("/admin/settings/contractor-plans")}
-            disabled={isLoading}
-            className="px-5 py-2 border border-gray-200 text-gray-700 font-semibold rounded-lg text-sm hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
-    </>
-  );
+      </div>
+
+      <div className="flex gap-3 pt-5">
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="px-6 py-3 bg-green-700 hover:bg-green-800 text-white rounded-xl font-semibold"
+        >
+          {isLoading
+            ? "Saving..."
+            : isEditing
+            ? "Save Changes"
+            : "Create Plan"}
+        </button>
+
+        <button
+          type="button"
+          onClick={()=>navigate("/admin/settings/contractor-plans")}
+          className="px-6 py-3 border rounded-xl"
+        >
+          Cancel
+        </button>
+
+      </div>
+
+    </form>
+  </>
+);
+
 };
 
 export default AddContractorPlan;

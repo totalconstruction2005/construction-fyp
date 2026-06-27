@@ -91,7 +91,7 @@ const Footer: React.FC = () => {
                   </div>
                   <div>
                     <p className="font-semibold text-white">Call us</p>
-                    <p className="text-gray-300">+088 (246) 642-27-10</p>
+                    <p className="text-gray-300">+92 3320515161</p>
                   </div>
                 </li>
 
@@ -101,7 +101,7 @@ const Footer: React.FC = () => {
                   </div>
                   <div>
                     <p className="font-semibold text-white">Send Email</p>
-                    <p className="text-gray-300">info@totalconstruction.com</p>
+                    <p className="text-gray-300">totalconstruction2005@gmail.com</p>
                   </div>
                 </li>
 

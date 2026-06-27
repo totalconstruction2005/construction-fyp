@@ -17,6 +17,7 @@ const contractorPlanSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+
     slug: {
       type: String,
       unique: true,
@@ -24,36 +25,116 @@ const contractorPlanSchema = new mongoose.Schema(
       trim: true,
       index: true,
     },
+
+    // Top Label
+    badge: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    // Example: Foundation to Roof Slab
+    subtitle: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    // Price
     price: {
       type: Number,
       required: true,
+      min: 0,
     },
+
     currency: {
       type: String,
-      default: "PKR",
+      default: "Rs.",
     },
-    tagline: {
+
+    // Example: per sq ft
+    priceUnit: {
       type: String,
+      default: "per sq ft",
+    },
+
+    // Estimate Text
+    estimateText: {
+      type: String,
+      default: "",
       trim: true,
     },
-    features: {
+
+    // Description paragraph
+    description: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    // What's Included
+    includedFeatures: {
       type: [String],
       default: [],
     },
+
+    // Not Included
+    excludedFeatures: {
+      type: [String],
+      default: [],
+    },
+
+    // Example: 4-6 Months
+    timeline: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    // Example: Ideal for families...
+    idealFor: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    // Button Text
+    buttonText: {
+      type: String,
+      default: "Select Package",
+    },
+
+    // Recommended Package
+    recommended: {
+      type: Boolean,
+      default: false,
+    },
+
+    // Card Theme
+    theme: {
+      type: String,
+      enum: ["green", "dark", "gold", "gray"],
+      default: "green",
+    },
+
     isActive: {
       type: Boolean,
       default: true,
     },
+
     sortOrder: {
       type: Number,
       required: true,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
 contractorPlanSchema.pre("validate", async function () {
-  // Auto-assign sortOrder for new documents
+
+  // Auto Sort Order
   if (this.isNew) {
     const lastPlan = await this.constructor
       .findOne({})
@@ -61,22 +142,30 @@ contractorPlanSchema.pre("validate", async function () {
       .select("sortOrder")
       .lean();
 
-    this.sortOrder = lastPlan ? lastPlan.sortOrder + 1 : 0;
+    this.sortOrder = lastPlan
+      ? lastPlan.sortOrder + 1
+      : 0;
   }
 
-  // Generate unique slug from title
+  // Generate Slug
   if (this.isNew || this.isModified("title")) {
-    if (!this.title) {
-      return; // Let validation handle missing title
-    }
+
+    if (!this.title) return;
 
     const ContractorPlan = mongoose.model("ContractorPlan");
+
     const baseSlug = toSlug(this.title);
+
     let slug = baseSlug;
+
     let counter = 1;
 
-    // Check for existing documents with same slug (excluding current document)
-    while (await ContractorPlan.exists({ slug, _id: { $ne: this._id } })) {
+    while (
+      await ContractorPlan.exists({
+        slug,
+        _id: { $ne: this._id },
+      })
+    ) {
       slug = `${baseSlug}-${counter}`;
       counter++;
     }
@@ -85,6 +174,11 @@ contractorPlanSchema.pre("validate", async function () {
   }
 });
 
-contractorPlanSchema.index({ sortOrder: 1 });
+contractorPlanSchema.index({
+  sortOrder: 1,
+});
 
-module.exports = mongoose.model("ContractorPlan", contractorPlanSchema);
+module.exports = mongoose.model(
+  "ContractorPlan",
+  contractorPlanSchema
+);

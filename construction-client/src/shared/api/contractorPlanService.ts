@@ -4,8 +4,30 @@ export type ContractorPlanInput = {
   title: string;
   price: number;
   currency: string;
-  tagline: string;
-  features: string[];
+
+  // Old fields (keep them for compatibility)
+  tagline?: string;
+  features?: string[];
+
+  // New fields
+  badge?: string;
+  subtitle?: string;
+  priceUnit?: string;
+  estimateText?: string;
+  description?: string;
+
+  includedFeatures?: string[];
+  excludedFeatures?: string[];
+
+  timeline?: string;
+  idealFor?: string;
+
+  buttonText?: string;
+
+  recommended?: boolean;
+
+  theme?: "green" | "dark" | "gold" | "gray";
+
   isActive: boolean;
 };
 
