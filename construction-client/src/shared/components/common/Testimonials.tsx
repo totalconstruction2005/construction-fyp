@@ -174,8 +174,7 @@ function Testimonials() {
 
           <a
             href="/reviews"
-            className="hidden sm:inline-flex absolute right-0 top-1/2 -translate-y-1/2 bg-white text-teal-900 border border-teal-900 hover:bg-teal-50 px-5 py-2 rounded-full text-sm font-semibold transition"
-          >
+            className="inline-flex absolute left-1/2 -translate-x-1/2 top-full mt-4 sm:left-auto sm:translate-x-0 sm:right-0 sm:top-1/2 sm:-translate-y-1/2 sm:mt-0 bg-white text-teal-900 border border-teal-900 hover:bg-teal-50 px-5 py-2 rounded-full text-sm font-semibold transition">
             View All Reviews
           </a>
         </div>
