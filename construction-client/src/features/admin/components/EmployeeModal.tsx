@@ -51,8 +51,8 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ open, employee, onClose, 
     e.preventDefault();
     setError(null);
 
-    if (!form.name.trim() || !form.email.trim() || !form.role.trim()) {
-      setError("Name, email, and role are required.");
+    if (!form.name.trim() || !form.role.trim()) {
+      setError("Name and role are required.");
       return;
     }
 
@@ -99,7 +99,7 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ open, employee, onClose, 
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1" htmlFor="modal-email">
-              Email <span className="text-red-500">*</span>
+              Email <span className="text-gray-400 text-xs">(Optional)</span>
             </label>
             <input
               id="modal-email"
@@ -108,7 +108,6 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ open, employee, onClose, 
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               placeholder="john@company.com"
-              required
             />
           </div>
 

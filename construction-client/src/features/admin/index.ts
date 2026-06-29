@@ -11,6 +11,7 @@ export { default as ChangePassword } from './pages/ChangePassword';
 export { default as ContractorPlansAdmin } from './pages/ContractorPlansAdmin';
 export { default as AddContractorPlan } from './pages/AddContractorPlan';
 export { default as AdminFloorPlans } from './pages/AdminFloorPlans';
+export { default as AdminReviews } from './pages/AdminReviews';
 export {default as EstimatorDashboard} from './pages/estimate/EstimatorDashboard';
 export { default as EstimatorRegions } from './pages/estimate/EstimatorRegions';
 export { default as EstimatorBreakdownTree } from './pages/estimate/EstimatorBreakdownTree';

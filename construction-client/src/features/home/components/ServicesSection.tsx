@@ -19,7 +19,7 @@ const ServicesSection: React.FC = () => {
     {
       title: "Design Studio",
       description:
-        "Visualize your dream project in 3D with our advanced design studio tools.",
+        "Visualize your dream project with our design studio tools.",
       buttonText: "ENQUIRE NOW",
       link: "/design-studio",
       img: img3,

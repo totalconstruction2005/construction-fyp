@@ -27,9 +27,11 @@ import {
   EstimatorBreakdownTree,
   EstimatorPreview,
   EstimatorPopularCalculations,
+  AdminReviews,
 } from "@features/admin";
 import { BookProject, MyProjects, ClientProjectUpdates } from "@features/project";
 import { ContactUs } from "@features/contact";
+import ReviewsPage from "@features/reviews/pages/ReviewsPage";
 import ScrollToTop from "@routes/ScrollToTop";
 import { ErrorBoundary } from "@shared/components";
 import { ClientLayout } from "@layouts";
@@ -52,6 +54,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/our-projects" element={<OurProjects />} />
+        <Route path="/reviews" element={<ReviewsPage />} />
         <Route path="/contact-us" element={<ContactUs />} />
         <Route path="/estimator" element={<ConstructionCostEstimator />} />
         <Route path="/estimator/final-construction-cost" element={<FinalConstructionCost />} />
@@ -101,6 +104,7 @@ function App() {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="employees" element={<EmployeeManagement />} />
+          <Route path="reviews" element={<AdminReviews />} />
           <Route path="projects" element={<ProjectApproval />} />
           <Route path="projects/:projectId/updates" element={<ProjectUpdates />} />
           <Route path="floor-plans" element={<AdminFloorPlans />} />

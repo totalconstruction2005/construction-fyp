@@ -117,7 +117,7 @@ const ContractorPlans: React.FC = () => {
                   className="rounded-2xl overflow-hidden flex flex-col shadow-2xl bg-[#1b5e35] border border-[#1b5e35] lg:-mt-4"
                 >
                   {/* Badge strip */}
-                  <div className="bg-[#154d2b] flex items-center justify-center gap-2.5 py-3 text-[11px] font-bold uppercase tracking-widest text-white">
+                  <div className="bg-[#154d2b] flex items-center justify-center gap-2 py-3 text-[11px] font-bold uppercase tracking-widest text-white">
                     <span>{plan.badge || "Most Popular"}</span>
                     <span className="border border-white/50 rounded-full px-3 py-0.5 text-[10px] font-semibold flex items-center gap-1">
                       ☆ Recommended
@@ -131,7 +131,7 @@ const ContractorPlans: React.FC = () => {
                     <p className="text-sm mt-1 text-green-200">{plan.subtitle}</p>
 
                     {/* Price — Rs. 4,000 per sq ft */}
-                    <div className="mt-6 flex items-baseline gap-1.5 flex-wrap">
+                    <div className="mt-3 flex items-baseline gap-1 flex-wrap">
                       <span className="text-lg font-bold text-green-300">{plan.currency}</span>
                       <span className="text-5xl font-extrabold leading-none text-green-300">
                         {plan.price.toLocaleString()}
@@ -140,20 +140,20 @@ const ContractorPlans: React.FC = () => {
                     </div>
 
                     {plan.estimateText && (
-                      <p className="text-xs italic mt-2 text-green-300">{plan.estimateText}</p>
+                      <p className="text-xs italic mt-1 text-green-300">{plan.estimateText}</p>
                     )}
                     {plan.description && (
-                      <p className="mt-4 text-sm leading-6 text-green-100">{plan.description}</p>
+                      <p className="mt-2 text-sm leading-6 text-green-100">{plan.description}</p>
                     )}
 
                     {/* Included */}
-                    <div className="mt-6">
-                      <p className="text-[11px] font-bold uppercase tracking-widest mb-2.5 text-green-300">
+                    <div className="mt-4">
+                      <p className="text-[12px] font-bold uppercase tracking-widest mb-2.5 text-green-300">
                         What's Included
                       </p>
-                      <ul className="space-y-2">
+                      <ul className="space-y-1">
                         {(plan.includedFeatures ?? []).map((item, i) => (
-                          <li key={i} className="flex items-start gap-2.5">
+                          <li key={i} className="flex items-start gap-2">
                             <span className="text-sm font-bold text-green-300 flex-shrink-0 mt-0.5">✓</span>
                             <span className="text-sm text-green-100">{item}</span>
                           </li>
@@ -163,13 +163,13 @@ const ContractorPlans: React.FC = () => {
 
                     {/* Excluded */}
                     {(plan.excludedFeatures?.length ?? 0) > 0 && (
-                      <div className="mt-5">
-                        <p className="text-[11px] font-bold uppercase tracking-widest mb-2.5 text-green-300">
+                      <div className="mt-4">
+                        <p className="text-[12px] font-bold uppercase tracking-widest mb-2.5 text-green-300">
                           Not Included
                         </p>
-                        <ul className="space-y-2">
+                        <ul className="space-y-1">
                           {(plan.excludedFeatures ?? []).map((item, i) => (
-                            <li key={i} className="flex items-start gap-2.5">
+                            <li key={i} className="flex items-start gap-2">
                               <span className="text-sm font-bold text-red-400 flex-shrink-0 mt-0.5">✕</span>
                               <span className="text-sm text-green-100">{item}</span>
                             </li>
@@ -179,7 +179,7 @@ const ContractorPlans: React.FC = () => {
                     )}
 
                     {/* Timeline & Ideal For */}
-                    <div className="border-t border-[#2d7a4a] mt-6 pt-5 space-y-2.5">
+                    <div className="border-t border-[#2d7a4a] mt-4 pt-3 space-y-2.5">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold text-white">🕐 Timeline</span>
                         <span className="text-sm text-green-200">{plan.timeline}</span>
@@ -192,7 +192,7 @@ const ContractorPlans: React.FC = () => {
 
                     <button
                       onClick={() => onSelect(plan._id)}
-                      className="mt-6 w-full py-3.5 rounded-xl text-sm font-bold tracking-wide bg-green-400 hover:bg-green-300 text-green-900 transition-colors"
+                      className="mt-5 w-full py-3 rounded-xl text-sm font-bold tracking-wide bg-green-400 hover:bg-green-300 text-green-900 transition-colors"
                     >
                       {plan.buttonText || "Select Package"}
                     </button>
@@ -232,21 +232,21 @@ const ContractorPlans: React.FC = () => {
                   </div>
 
                   {plan.estimateText && (
-                    <p className="text-xs italic mt-2 text-gray-400">{plan.estimateText}</p>
+                    <p className="text-xs italic mt-1 text-gray-400">{plan.estimateText}</p>
                   )}
                   {plan.description && (
-                    <p className="mt-4 text-sm leading-6 text-gray-600">{plan.description}</p>
+                    <p className="mt-2 text-sm leading-6 text-gray-600">{plan.description}</p>
                   )}
                 </div>
 
                 <div className="px-7 pb-7 flex flex-col flex-1">
 
                   {/* Included */}
-                  <div className="mt-6">
-                    <p className="text-[11px] font-bold uppercase tracking-widest mb-2.5 text-gray-400">
+                  <div className="mt-3">
+                    <p className="text-[12px] font-bold uppercase tracking-widest mb-2.5 text-gray-400">
                       What's Included
                     </p>
-                    <ul className="space-y-2">
+                    <ul className="space-y-1">
                       {(plan.includedFeatures ?? []).map((item, i) => (
                         <li key={i} className="flex items-start gap-2.5">
                           <span className="text-sm font-bold text-green-600 flex-shrink-0 mt-0.5">✓</span>
@@ -258,11 +258,11 @@ const ContractorPlans: React.FC = () => {
 
                   {/* Excluded */}
                   {(plan.excludedFeatures?.length ?? 0) > 0 && (
-                    <div className="mt-5">
-                      <p className="text-[11px] font-bold uppercase tracking-widest mb-2.5 text-gray-400">
+                    <div className="mt-3">
+                      <p className="text-[12px] font-bold uppercase tracking-widest mb-2.5 text-gray-400">
                         Not Included
                       </p>
-                      <ul className="space-y-2">
+                      <ul className="space-y-1">
                         {(plan.excludedFeatures ?? []).map((item, i) => (
                           <li key={i} className="flex items-start gap-2.5">
                             <span className="text-sm font-bold text-red-400 flex-shrink-0 mt-0.5">✕</span>
@@ -274,7 +274,7 @@ const ContractorPlans: React.FC = () => {
                   )}
 
                   {/* Timeline & Ideal For */}
-                  <div className="border-t border-gray-100 mt-6 pt-5 space-y-2.5">
+                  <div className="border-t border-gray-100 mt-3 pt-3 space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-semibold text-gray-800">🕐 Timeline</span>
                       <span className="text-sm text-gray-500">{plan.timeline}</span>
@@ -288,7 +288,7 @@ const ContractorPlans: React.FC = () => {
                   {/* Dark green button matching inspo */}
                   <button
                     onClick={() => onSelect(plan._id)}
-                    className="mt-6 w-full py-3.5 rounded-xl text-sm font-semibold tracking-wide bg-[#1b5e35] hover:bg-[#154d2b] text-white transition-colors"
+                    className="mt-3 w-full py-3.5 rounded-xl text-sm font-semibold tracking-wide bg-[#1b5e35] hover:bg-[#154d2b] text-white transition-colors"
                   >
                     {plan.buttonText || "Select Package"}
                   </button>

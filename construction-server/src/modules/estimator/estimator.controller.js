@@ -5,8 +5,8 @@ const mongoose = require('mongoose');
 
 // Unit conversion map (can be extended or moved to DB later)
 const UNIT_TO_SQFT = {
-  Marla: 272.25,
-  Kanal: 5445,
+  Marla: 225,
+  Kanal: 4500,
   'Sq Yard': 9,
   'Sq Meter': 10.764,
   Acre: 43560,

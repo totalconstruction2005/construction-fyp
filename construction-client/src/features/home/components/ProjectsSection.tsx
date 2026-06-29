@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@shared/components";
+import { useNavigate } from "react-router-dom";
 import img1 from "@assets/img6.jpg";
 import img2 from "@assets/img8.jpg";
 import img3 from "@assets/img9.jpg";
@@ -8,6 +9,7 @@ import img4 from "@assets/img7.jpg";
 import bgImg from "@assets/img7.jpg"; // background image
 
 const ProjectsSection: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <section id="projects" className="py-5 sm:py-15 bg-white">
       {/* === Main Content === */}
@@ -115,7 +117,12 @@ const ProjectsSection: React.FC = () => {
 
               {/* Right Button */}
               <div className="w-full sm:w-[30%] flex justify-center sm:justify-end">
-                <Button label="ENQUIRE NOW" variant="primary" />
+                <Button onClick={() => {
+                   
+                      navigate('/book-project');
+                    
+                  }}
+                   label="ENQUIRE NOW" variant="primary" />
               </div>
             </div>
           </div>

@@ -64,6 +64,16 @@ const AdminLayout: React.FC = () => {
               Employees
             </Link>
             <Link
+              to="/admin/reviews"
+              className={`block px-3 py-2 rounded-lg transition ${
+                isActive("/admin/reviews")
+                  ? "bg-emerald-100 text-emerald-700"
+                  : "hover:bg-emerald-50 text-gray-800"
+              }`}
+            >
+              Reviews
+            </Link>
+            <Link
               to="/admin/map-requests"
               className={`block px-3 py-2 rounded-lg transition ${
                 isActive("/admin/map-requests")

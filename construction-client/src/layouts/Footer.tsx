@@ -59,11 +59,11 @@ const Footer: React.FC = () => {
                 Company
               </h3>
               <ul className="space-y-1.5 sm:space-y-2 text-sm">
-                <li><a href="#" className="hover:text-lime-400 transition">Home</a></li>
-                <li><a href="#" className="hover:text-lime-400 transition">About</a></li>
-                <li><a href="#" className="hover:text-lime-400 transition">Services</a></li>
-                <li><a href="#" className="hover:text-lime-400 transition">Projects</a></li>
-                <li><a href="#" className="hover:text-lime-400 transition">Contact</a></li>
+                <li><a href="/" className="hover:text-lime-400 transition">Home</a></li>
+                <li><a href="/about" className="hover:text-lime-400 transition">About</a></li>
+                <li><a href="/book-project" className="hover:text-lime-400 transition">Services</a></li>
+                <li><a href="/our-projects" className="hover:text-lime-400 transition">Projects</a></li>
+                <li><a href="/contact-us" className="hover:text-lime-400 transition">Contact</a></li>
               </ul>
             </div>
 
@@ -73,9 +73,9 @@ const Footer: React.FC = () => {
                 Support
               </h3>
               <ul className="space-y-1.5 sm:space-y-2 text-sm">
-                <li><a href="#" className="hover:text-lime-400 transition">Blog</a></li>
-                <li><a href="#" className="hover:text-lime-400 transition">Careers</a></li>
-                <li><a href="#" className="hover:text-lime-400 transition">Testimonials</a></li>
+                <li><a href="/" className="hover:text-lime-400 transition">Blog</a></li>
+                <li><a href="/" className="hover:text-lime-400 transition">Careers</a></li>
+                <li><a href="/" className="hover:text-lime-400 transition">Testimonials</a></li>
               </ul>
             </div>
 
@@ -91,7 +91,7 @@ const Footer: React.FC = () => {
                   </div>
                   <div>
                     <p className="font-semibold text-white">Call us</p>
-                    <p className="text-gray-300">+92 3320515161</p>
+                    <p className="text-gray-300">+92 332 0515161</p>
                   </div>
                 </li>
 

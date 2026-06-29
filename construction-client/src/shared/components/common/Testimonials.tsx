@@ -1,39 +1,39 @@
 import { useState, useEffect } from "react";
+import { apiClient } from "@shared/api/apiClient";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faStar,
-  faStarHalfAlt ,
+  faStarHalfAlt,
   faQuoteRight,
 } from "@fortawesome/free-solid-svg-icons";
-import user1 from "@assets/img1.jpg";
-import user2 from "@assets/img2.jpg";
-import user3 from "@assets/img3.jpg";
+import user from "@assets/demo_profile.jpg";
 
+
+const STATIC_TESTIMONIALS = [
+  {
+    name: "Muhammad Ahmed",
+    role: "Residential Construction",
+    text: "It turned our dream home into reality. The attention to detail and craftsmanship were truly outstanding.",
+    img: user,
+    rating: 4.5,
+  },
+  {
+    name: "Sara Batool",
+    role: "Commercial Project",
+    text: "Professional, punctual, and reliable — Total Construction delivered our office space on time and beyond expectations.",
+    img: user,
+    rating: 4,
+  },
+  {
+    name: "Bashir Khan",
+    role: "Renovation",
+    text: "From the first consultation to the final handover, Total Construction made the process smooth and stress-free.",
+    img: user,
+    rating: 5,
+  },
+];
 function Testimonials() {
-  const testimonials = [
-    {
-      name: "Martin Roberts",
-      role: "Residential Construction",
-      text: "It turned our dream home into reality. The attention to detail and craftsmanship were truly outstanding.",
-      img: user1,
-      rating: 4.5,
-    },
-    {
-      name: "Emily Blunt",
-      role: "Commercial Project",
-      text: "Professional, punctual, and reliable — Total Construction delivered our office space on time and beyond expectations.",
-      img: user2,
-      rating: 4,
-    },
-    {
-      name: "Sarah Johnson",
-      role: "Renovation",
-      text: "From the first consultation to the final handover, Total Construction made the process smooth and stress-free.",
-      img: user3,
-      rating: 5,
-    },
-  ];
-
+  const [testimonials] = useState(STATIC_TESTIMONIALS);
   const [centerIndex, setCenterIndex] = useState(0);
   const [prevCenterIndex, setPrevCenterIndex] = useState<number | null>(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -43,30 +43,50 @@ function Testimonials() {
     review: "",
   });
   const [showThankYou, setShowThankYou] = useState(false);
+  const [submittingReview, setSubmittingReview] = useState(false);
 
-  const handleSubmitReview = (e: React.FormEvent) => {
+
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Show thank you message
-    setShowThankYou(true);
-    // Reset form
-    setReviewForm({ name: "", rating: 5, review: "" });
-    // Close modal after 2 seconds
-    setTimeout(() => {
-      setShowReviewModal(false);
-      setShowThankYou(false);
-    }, 2000);
+    if (submittingReview) return;
+    setSubmittingReview(true);
+
+    try {
+      const result = await apiClient.post<any>("/api/reviews", reviewForm);
+      if (result.success) {
+        // Show thank you message
+        setShowThankYou(true);
+        // Reset form
+        setReviewForm({ name: "", rating: 5, review: "" });
+        // Close modal after 4 seconds to let user read the message
+        setTimeout(() => {
+          setShowReviewModal(false);
+          setShowThankYou(false);
+        }, 4000);
+      } else {
+        alert(result.message || "Failed to submit review");
+      }
+    } catch (error: any) {
+      console.error("Error submitting review:", error);
+      alert(error?.message || "Something went wrong. Please try again.");
+    } finally {
+      setSubmittingReview(false);
+    }
   };
 
   useEffect(() => {
+    if (testimonials.length === 0) return;
     const interval = setInterval(() => {
       setPrevCenterIndex(centerIndex);
       setCenterIndex((prev) => (prev + 1) % testimonials.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, [centerIndex]);
+  }, [centerIndex, testimonials.length]);
 
   const getStyle = (index: number) => {
-    const prevIndex = (centerIndex - 1 + testimonials.length) % testimonials.length;
+    const prevIndex =
+      (centerIndex - 1 + testimonials.length) % testimonials.length;
     const nextIndex = (centerIndex + 1) % testimonials.length;
 
     if (index === centerIndex) {
@@ -89,7 +109,8 @@ function Testimonials() {
       };
     } else if (index === prevCenterIndex) {
       const direction =
-        index < centerIndex || (centerIndex === 0 && index === testimonials.length - 1)
+        index < centerIndex ||
+        (centerIndex === 0 && index === testimonials.length - 1)
           ? -1
           : 1;
       return {
@@ -115,7 +136,7 @@ function Testimonials() {
             key={i}
             icon={faStar}
             className="text-yellow-400 mr-1 text-xs"
-          />
+          />,
         );
       } else if (i === fullStars && hasHalfStar) {
         stars.push(
@@ -123,7 +144,7 @@ function Testimonials() {
             key={i}
             icon={faStarHalfAlt}
             className="text-yellow-400 mr-1 text-xs"
-          />
+          />,
         );
       } else {
         stars.push(
@@ -131,7 +152,7 @@ function Testimonials() {
             key={i}
             icon={faStar}
             className="text-gray-300 mr-1 text-xs"
-          />
+          />,
         );
       }
     }
@@ -141,13 +162,23 @@ function Testimonials() {
   return (
     <section className="bg-gray-50 py-7 sm:py-7 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 text-center w-[95%] sm:w-[85%]">
-        {/* Heading */}
-        <p className="text-sm font-semibold uppercase text-teal-800 tracking-wider mb-2">
-          Testimonials
-        </p>
-        <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-3">
-          What Our Clients Say
-        </h2>
+       
+        <div className="relative mb-6">
+          <p className="text-sm font-semibold uppercase text-teal-800 tracking-wider mb-2 text-center">
+            Testimonials
+          </p>
+
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 text-center">
+            What Our Clients Say
+          </h2>
+
+          <a
+            href="/reviews"
+            className="hidden sm:inline-flex absolute right-0 top-1/2 -translate-y-1/2 bg-white text-teal-900 border border-teal-900 hover:bg-teal-50 px-5 py-2 rounded-full text-sm font-semibold transition"
+          >
+            View All Reviews
+          </a>
+        </div>
 
         {/* Add Review Button */}
         <div className="mb-6">
@@ -171,7 +202,9 @@ function Testimonials() {
                   >
                     ×
                   </button>
-                  <h3 className="text-2xl font-bold text-gray-800 mb-4">Add Your Review</h3>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4">
+                    Add Your Review
+                  </h3>
                   <form onSubmit={handleSubmitReview}>
                     <div className="mb-4">
                       <label className="block text-left text-sm font-semibold text-gray-700 mb-2">
@@ -180,7 +213,9 @@ function Testimonials() {
                       <input
                         type="text"
                         value={reviewForm.name}
-                        onChange={(e) => setReviewForm({ ...reviewForm, name: e.target.value })}
+                        onChange={(e) =>
+                          setReviewForm({ ...reviewForm, name: e.target.value })
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-teal-800"
                         required
                       />
@@ -194,12 +229,18 @@ function Testimonials() {
                           <button
                             key={star}
                             type="button"
-                            onClick={() => setReviewForm({ ...reviewForm, rating: star })}
+                            onClick={() =>
+                              setReviewForm({ ...reviewForm, rating: star })
+                            }
                             className="text-2xl focus:outline-none"
                           >
                             <FontAwesomeIcon
                               icon={faStar}
-                              className={star <= reviewForm.rating ? "text-yellow-400" : "text-gray-300"}
+                              className={
+                                star <= reviewForm.rating
+                                  ? "text-yellow-400"
+                                  : "text-gray-300"
+                              }
                             />
                           </button>
                         ))}
@@ -211,7 +252,12 @@ function Testimonials() {
                       </label>
                       <textarea
                         value={reviewForm.review}
-                        onChange={(e) => setReviewForm({ ...reviewForm, review: e.target.value })}
+                        onChange={(e) =>
+                          setReviewForm({
+                            ...reviewForm,
+                            review: e.target.value,
+                          })
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-teal-800 h-32 resize-none"
                         required
                       />
@@ -226,9 +272,15 @@ function Testimonials() {
                 </>
               ) : (
                 <div className="text-center py-8">
-                  <div className="text-6xl mb-4">🎉</div>
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">Thank You!</h3>
-                  <p className="text-gray-600">Your review has been submitted successfully.</p>
+                  <div className="text-6xl mb-4">✔</div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                    Thank you for your review.
+                  </h3>
+                  <p className="text-gray-600">We appreciate your feedback.</p>
+                  <p className="text-gray-500 text-sm mt-2">
+                    Your review has been submitted successfully and will appear
+                    after approval.
+                  </p>
                 </div>
               )}
             </div>

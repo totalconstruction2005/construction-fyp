@@ -8,7 +8,7 @@ const DifferentiatorsSection: React.FC = () => {
     {
       icon: faMapMarkedAlt,
       title: "Local Knowledge",
-      desc: "Deep understanding of Austin’s codes, climate, and construction standards.",
+      desc: "Deep understanding of Pakistan's codes, climate, and construction standards.",
     },
     {
       icon: faHelmetSafety,

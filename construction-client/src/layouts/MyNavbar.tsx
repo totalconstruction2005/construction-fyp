@@ -235,14 +235,9 @@ const MyNavbar: React.FC<NavbarProps> = ({ transparent = true }) => {
 
                 <button 
                   onClick={() => {
-                    if (location.pathname === '/') {
-                      const footerBanner = document.querySelector('.footer-banner-section');
-                      if (footerBanner) {
-                        footerBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      }
-                    } else {
+                   
                       navigate('/contact-us');
-                    }
+                    
                   }}
                   className="bg-lime-300 text-green-900 px-5 py-1.5 rounded-full font-medium text-sm hover:bg-lime-400 transition duration-300"
                 >

@@ -87,11 +87,10 @@ const About: React.FC = () => {
                   <div className="w-1 h-16 bg-emerald-500 rounded-full flex-shrink-0"></div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      Contractor Hiring
+                      Complete Construction Solutions
                     </h3>
                     <p className="text-gray-600 text-sm">
-                      Connect with vetted, professional contractors who match your project requirements 
-                      and budget. Choose from flexible plans and transparent pricing.
+                      Bring your dream home to life with Total Construction. Select a construction package tailored to your needs, and our experts will manage every stage of the project—from planning and materials to final finishing.
                     </p>
                   </div>
                 </div>
@@ -120,8 +119,7 @@ const About: React.FC = () => {
                       Design & Visualization
                     </h3>
                     <p className="text-gray-600 text-sm">
-                      Transform your ideas into visual plans with our design tools. Create custom layouts 
-                      and view 3D visualizations before construction begins.
+                      Transform your ideas into visual plans with our design tools. Create custom layouts .
                     </p>
                   </div>
                 </div>

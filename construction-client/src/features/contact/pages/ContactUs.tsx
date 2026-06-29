@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { apiClient } from "@shared/api/apiClient";
 import { Link } from "react-router-dom";
 import { MyNavbar, Footer } from "@layouts";
 
@@ -59,14 +60,29 @@ const ContactUs: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [showThankYou, setShowThankYou] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (validateForm()) {
-      // Handle form submission
-      console.log("Form submitted:", formData);
-      alert("Thank you for contacting us! We will get back to you soon.");
-      handleReset();
+      if (submitting) return;
+      setSubmitting(true);
+      try {
+        const result = await apiClient.post<any>("/api/contact/meeting", formData);
+        if (result.success) {
+          setShowThankYou(true);
+          handleReset();
+        } else {
+          alert(result.message || "Failed to submit request");
+        }
+      } catch (error: any) {
+        console.error("Error submitting contact request:", error);
+        alert(error?.message || "Something went wrong. Please check your connection and try again.");
+      } finally {
+        setSubmitting(false);
+      }
     }
   };
 
@@ -179,7 +195,7 @@ const ContactUs: React.FC = () => {
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900 text-sm">Phone</p>
-                    <p className="text-gray-600 text-sm">+088 (246) 642-27-10</p>
+                    <p className="text-gray-600 text-sm">+92 332 0515161</p>
                   </div>
                 </div>
 
@@ -202,7 +218,7 @@ const ContactUs: React.FC = () => {
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900 text-sm">Email</p>
-                    <p className="text-gray-600 text-sm">info@totalconstruction.com</p>
+                    <p className="text-gray-600 text-sm">totalconstruction2005@gmail.com</p>
                   </div>
                 </div>
 
@@ -397,6 +413,34 @@ const ContactUs: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {/* Success Modal Overlay */}
+      {showThankYou && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center relative border border-gray-100 shadow-2xl">
+            <button
+              onClick={() => setShowThankYou(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl"
+            >
+              ×
+            </button>
+            <div className="text-emerald-500 text-6xl mb-4">✔</div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Thank You!</h3>
+            <p className="text-gray-600 text-sm mb-4">
+              We have received your request.
+            </p>
+            <p className="text-gray-600 text-sm">
+              Our team will contact you shortly.
+            </p>
+            <button
+              onClick={() => setShowThankYou(false)}
+              className="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-lg text-sm transition"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

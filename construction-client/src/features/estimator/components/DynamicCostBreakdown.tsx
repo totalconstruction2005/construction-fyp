@@ -41,9 +41,17 @@ const RenderNode: React.FC<{ node: Node; depth?: number }> = ({ node, depth = 0 
               {node.name}
             </span>
             {node.notes && (
-              <span className="block truncate text-xs text-gray-400 mt-0.5">
-                {node.notes}
-              </span>
+              <div className="mt-1 text-xs text-gray-400 space-y-0.5">
+                {node.notes
+                  .split("\n")
+                  .map((line) => line.trim())
+                  .filter((line) => line.length > 0)
+                  .map((line, idx) => (
+                    <span key={idx} className="block">
+                      • {line}
+                    </span>
+                  ))}
+              </div>
             )}
           </div>
         </div>
@@ -88,7 +96,17 @@ const DynamicCostBreakdown: React.FC<{ breakdown: Node[] }> = ({ breakdown }) =>
                 {node.name}
               </h3>
               {node.notes && (
-                <p className="mt-0.5 text-sm text-gray-500">{node.notes}</p>
+                <div className="mt-1 text-sm text-gray-500 space-y-0.5">
+                  {node.notes
+                    .split("\n")
+                    .map((line) => line.trim())
+                    .filter((line) => line.length > 0)
+                    .map((line, idx) => (
+                      <span key={idx} className="block">
+                        • {line}
+                      </span>
+                    ))}
+                </div>
               )}
             </div>
 

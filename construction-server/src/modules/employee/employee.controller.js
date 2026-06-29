@@ -19,7 +19,7 @@ exports.createEmployee = asyncHandler(async (req, res) => {
   const { name, email, role, phone, status } = req.body;
 
   // Validate required fields
-  const missingFields = validators.validateRequired(req.body, ["name", "email", "role"]);
+  const missingFields = validators.validateRequired(req.body, ["name", "role"]);
   if (missingFields.length > 0) {
     throw new AppError(
       `Missing required fields: ${missingFields.join(", ")}`,
@@ -28,20 +28,23 @@ exports.createEmployee = asyncHandler(async (req, res) => {
     );
   }
 
-  // Validate email format
-  const trimmedEmail = email.trim().toLowerCase();
-  if (!validators.validateEmail(trimmedEmail)) {
-    throw new AppError("Invalid email format", 400, "INVALID_EMAIL_FORMAT");
-  }
+  let trimmedEmail = undefined;
+  if (email && email.trim()) {
+    trimmedEmail = email.trim().toLowerCase();
+    // Validate email format
+    if (!validators.validateEmail(trimmedEmail)) {
+      throw new AppError("Invalid email format", 400, "INVALID_EMAIL_FORMAT");
+    }
 
-  // Check for duplicate email
-  const existingEmployee = await Employee.findOne({ email: trimmedEmail }).lean();
-  if (existingEmployee) {
-    throw new AppError(
-      "An employee with this email already exists",
-      400,
-      "DUPLICATE_EMAIL"
-    );
+    // Check for duplicate email
+    const existingEmployee = await Employee.findOne({ email: trimmedEmail }).lean();
+    if (existingEmployee) {
+      throw new AppError(
+        "An employee with this email already exists",
+        400,
+        "DUPLICATE_EMAIL"
+      );
+    }
   }
 
   // Validate status enum
@@ -91,26 +94,30 @@ exports.updateEmployee = asyncHandler(async (req, res) => {
 
   // Validate and sanitize email if provided
   if (email !== undefined) {
-    const trimmedEmail = email.trim().toLowerCase();
-    if (!validators.validateEmail(trimmedEmail)) {
-      throw new AppError("Invalid email format", 400, "INVALID_EMAIL_FORMAT");
+    if (!email || !email.trim()) {
+      updateData.email = undefined;
+    } else {
+      const trimmedEmail = email.trim().toLowerCase();
+      if (!validators.validateEmail(trimmedEmail)) {
+        throw new AppError("Invalid email format", 400, "INVALID_EMAIL_FORMAT");
+      }
+
+      // Check for duplicate with different ID
+      const existingEmployee = await Employee.findOne({
+        email: trimmedEmail,
+        _id: { $ne: id },
+      }).lean();
+
+      if (existingEmployee) {
+        throw new AppError(
+          "An employee with this email already exists",
+          400,
+          "DUPLICATE_EMAIL"
+        );
+      }
+
+      updateData.email = trimmedEmail;
     }
-
-    // Check for duplicate with different ID
-    const existingEmployee = await Employee.findOne({
-      email: trimmedEmail,
-      _id: { $ne: id },
-    }).lean();
-
-    if (existingEmployee) {
-      throw new AppError(
-        "An employee with this email already exists",
-        400,
-        "DUPLICATE_EMAIL"
-      );
-    }
-
-    updateData.email = trimmedEmail;
   }
 
   // Validate and sanitize role if provided

@@ -11,12 +11,11 @@ const employeeSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: true,
-      unique: true,
+      sparse: true,
       lowercase: true,
       trim: true,
       validate: {
-        validator: (value) => emailRegex.test(value),
+        validator: (value) => !value || emailRegex.test(value),
         message: "Invalid email format",
       },
     },
