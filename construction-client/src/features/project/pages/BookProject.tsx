@@ -34,7 +34,7 @@ const BookProject: React.FC = () => {
       <MyNavbar transparent={false} />
 
       <main className="flex-grow max-w-3xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
-        <header className="mb-8 sm:mb-10">
+        <header className="mb-8 sm:mb-10 p-1.5">
           <p className="text-xs uppercase tracking-[0.2em] text-emerald-700 font-semibold">Guided Journey</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-1">Start Your Project</h1>
           <p className="text-gray-600 mt-2">
